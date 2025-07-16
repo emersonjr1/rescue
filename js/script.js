@@ -9,6 +9,7 @@ function start(){
     var velocidade = 5
     var posicaoY = parseInt(Math.random()*334);
     jogo.pressionou = []; 
+    var podeAtirar = true;
 
     var TECLA = {
         W: 87,
@@ -64,6 +65,7 @@ function start(){
 
         if(jogo.pressionou[TECLA.D]){
             //função disparo
+            disparo();
         }
     }
 
@@ -103,6 +105,75 @@ function start(){
         }
     }
 
+    function disparo(){
+        if (podeAtirar==true){
+            podeAtirar= false;
+            topo = parseInt($("#jogador").css("top"))
+            posicaoX = parseInt($("#jogador").css("left"))
+            tiroX = posicaoX + 190;
+            topoTiro = topo + 37;
+            $("#fundoGame").append("<div id='disparo'></div>");
+            $("#disparo").css("top", topoTiro)
+            $("#disparo").css("left", tiroX)
+            var tempoDisparo = window.setInterval(executaDisparo, 30);
+
+        }
+        function executaDisparo(){
+            posicaoX = parseInt($("#disparo").css("left"))
+            $("#disparo").css("left", posicaoX + 15)
+            if(posicaoX>900){
+                window.clearInterval(tempoDisparo)
+                tempoDisparo = null
+                $("#disparo").remove()
+                podeAtirar  = true
+            }
+        }
+    }
+
+
+
+
+    //Colisao de jogador com inimigo1
+    function colisao(){
+        var colisao1 = ($("#jogador").collision($("#inimigo1")));
+        var colisao2 = ($("#jogador").collision($("#inimigo2")));
+        var colisao3 = ($("#disparo").collision($("#inimigo1")));
+        var colisao4 = ($("#disparo").collision($("#inimigo2")));
+        var colisao5 = ($("#jogador").collision($("#amigo")));
+        var colisao6 = ($("#inimigo2").collision($("#amigo")));
+        
+        if(colisao1.length > 0){
+            inimigo1X = parseInt($("#inimigo1").css("left"));
+            inimigo1Y = parseInt($("#inimigo1").css("top"));
+            explosao1(inimigo1X, inimigo1Y);
+
+            posicaoY = parseInt(Math.random() * 334);
+            $("#inimigo1").css("left", 694);
+            $("#inimigo1").css("top", posicaoY);
+        }
+
+         if(colisao2.length > 0){
+            
+        }
+
+    } //Fim da colisao
+
+    function explosao1(inimigo1X, inimigo1Y){
+       //somExplosao.play();
+        $("#fundoGame").append("<div id='explosao1'></div>");
+        $("#explosao1").css("background-image","url(../img/explosao.png)");
+        var div = $("#explosao1") // Corrigido aqui
+        div.css("top", inimigo1Y)
+        div.css("left", inimigo1X)
+        div.animate({width:200, opacity:0}, 'slow');
+        var tempoExplosao = window.setInterval(removeExplosao, 1000);
+        
+        function removeExplosao(){
+            div.remove();
+            window.clearInterval(tempoExplosao);
+            tempoExplosao = null;
+        }
+    }
     
 
 
@@ -114,6 +185,7 @@ function start(){
         moveinimigo1();
         moveinimigo2();
         moveamigo()
+        colisao()
     };
     
 }
@@ -122,4 +194,3 @@ function start(){
 
 
 
- 
